@@ -1,0 +1,38 @@
+---------------------------------------------------------Application code--------------------------------------------------------
+from tkinter import *
+import speech_recognition as sr
+import pandas as pd
+r=sr.Recognizer()
+lyrics=pd.read_csv('H:\Study Material\Sem 8\lyrics.csv')
+lyrics.dropna()
+root=Tk()
+root.title('Song recognition app')
+root.geometry('500x300');
+thelabel=Label(root,text='Song recognition app')
+thelabel.grid(column=1, row=0)       
+
+def convertandidentify():
+    with sr.Microphone() as source:
+        print("Say Something");
+        audio=r.listen(source)
+        print("Time over Thanks");
+    try:
+        text=r.recognize_google(audio);
+        textlabel=Label(root,text='you said:{}'.format(text),font=('Times New Roman',30))
+        textlabel.grid(column=0,row=2)
+        
+        lc = lyrics.lyrics
+        lyrics["indexes"]=lc.str.find(text)
+        out=lyrics.loc[lyrics["indexes"].idxmax()]
+        songlabel=Label(root, text="song: {}".format(out["song"]),font=('Times New Roman',15))
+        songlabel.grid(column=0,row=4)
+        artistlabel=Label(root, text="artist: {}".format(out["artist"]),font=('Times New Roman',15))
+        artistlabel.grid(column=0,row=5)
+        genrelabel=Label(root, text="genre: {}".format(out["genre"]),font=('Times New Roman',15))
+        genrelabel.grid(column=0,row=6)
+    except:
+        print("couldn't recognise")
+   
+button1=Button(text='press and sing',font=('Times New Roman',15),fg='black',command=convertandidentify)
+button1.grid(column=0,row=1)
+root.mainloop()
